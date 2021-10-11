@@ -36,24 +36,29 @@ namespace H3ProjektAPI.Controllers
             //If the user object from the parameter is equal to null
             if (user != null && !String.IsNullOrEmpty(user.Username) && !String.IsNullOrEmpty(user.Password))
             {
-                if (manager.CheckUsername(user.Username, data))
+                //If the username contains special characters
+                if (user.Username.All(u => Char.IsLetterOrDigit(u)))
                 {
-                    manager.LogDbLogin(user.Username, "Register", "No token", "Register denied", data);
-                    return Conflict("User already exists");
+                    if (manager.CheckUsername(user.Username, data))
+                    {
+                        manager.LogDbLogin(user.Username, "Register", "No token", "Register denied", data);
+                        return Conflict("User already exists");
+                    }
+                    //New instance of the user class that will be mapped to the database using Entity Framework CodeFirst approach
+                    DbUser dbUser = new DbUser();
+
+                    //Sets the values of the dbUser
+                    dbUser.Username = user.Username;
+                    dbUser.Salt = manager.GenerateSalt();
+                    dbUser.HashedPassword = manager.CreateHashedPassword(user.Password, dbUser.Salt);
+
+                    manager.LogDbLogin(user.Username, "Register", "No token", "Register successfull", data);
+                    //Adds the dbUser instance for database insertion, and saves changes made afterwards
+                    data.Users.Add(dbUser);
+                    data.SaveChanges();
+                    return Ok();
                 }
-                //New instance of the user class that will be mapped to the database using Entity Framework CodeFirst approach
-                DbUser dbUser = new DbUser();
-
-                //Sets the values of the dbUser
-                dbUser.Username = user.Username;
-                dbUser.Salt = manager.GenerateSalt();
-                dbUser.HashedPassword = manager.CreateHashedPassword(user.Password, dbUser.Salt);
-
-                manager.LogDbLogin(user.Username, "Register", "No token", "Register successfull", data);
-                //Adds the dbUser instance for database insertion, and saves changes made afterwards
-                data.Users.Add(dbUser);
-                data.SaveChanges();
-                return Ok();
+                return Conflict();
             }
             //If something went wrong, a 400 Bad Request is sent to the user
             else
@@ -66,14 +71,13 @@ namespace H3ProjektAPI.Controllers
         //HTTP get for user login and verification
         [HttpGet, Route("Login")]
         public IActionResult Login(string username, string password)
-            {
+        {
             //If the user input is null or empty, a 401 Unauthorized is returned, specifying the login failed
             if (String.IsNullOrEmpty(username) || String.IsNullOrEmpty(password))
             {
                 manager.LogDbLogin(username, "Login", "No token", "Login Denied", data);
                 return Unauthorized("Login denied");
             }
-
             //Checks if the username exists in the database
             if (manager.CheckUsername(username, data))
             {
@@ -99,6 +103,7 @@ namespace H3ProjektAPI.Controllers
                     return Ok(new { Token = tokenString });
                 }
             }
+
             manager.LogDbLogin(username, "Login", "No token", "Login Invalid", data);
             //If something goes wrong, a 400 Bad Request is sent to the user with the "Invalied request" text
             return BadRequest("Invalid request");
