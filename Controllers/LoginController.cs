@@ -76,7 +76,7 @@ namespace H3ProjektAPI.Controllers
             if (String.IsNullOrEmpty(username) || String.IsNullOrEmpty(password))
             {
                 manager.LogDbLogin(username, "Login", "No token", "Login Denied", data);
-                return Unauthorized("Login denied");
+                return BadRequest("Login denied");
             }
             //Checks if the username exists in the database
             if (manager.CheckUsername(username, data))
@@ -106,7 +106,7 @@ namespace H3ProjektAPI.Controllers
 
             manager.LogDbLogin(username, "Login", "No token", "Login Invalid", data);
             //If something goes wrong, a 400 Bad Request is sent to the user with the "Invalied request" text
-            return BadRequest("Invalid request");
+            return Unauthorized("Invalid request");
         }
     }
 }
