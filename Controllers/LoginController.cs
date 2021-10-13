@@ -20,7 +20,7 @@ namespace H3ProjektAPI.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly LoginDBContext data;
+        public readonly LoginDBContext data;
         private DalManager manager = new DalManager();
 
         public LoginController(LoginDBContext context)
