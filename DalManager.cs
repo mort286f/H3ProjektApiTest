@@ -11,8 +11,10 @@ using H3ProjektAPITest.Models;
 namespace H3ProjektAPITest
 {
     //Manager class
-    public class DalManager
+    public class DalManager : IDalManager
     {
+        
+
         //Generates a salt value for password hashing
         public string GenerateSalt()
         {
@@ -58,9 +60,9 @@ namespace H3ProjektAPITest
         /// <param name="passwrd">The inputted password value from the user</param>
         /// <param name="salt">A generated salt value for hash generation</param>
         /// <returns></returns>
-        public string CreateHashedPassword(string passwrd, string salt)
+        public string CreateHashedPassword(string password, string salt)
         {
-            byte[] pwdWithSalt = Encoding.ASCII.GetBytes(string.Concat(passwrd, salt));
+            byte[] pwdWithSalt = Encoding.ASCII.GetBytes(string.Concat(password, salt));
             using (var sha256 = SHA256.Create())
             {
                 return Convert.ToBase64String(sha256.ComputeHash(pwdWithSalt));
@@ -117,6 +119,7 @@ namespace H3ProjektAPITest
                 return false;
             }
         }
+
 
         public void LogDbLogin(string username, string userChoice, string token, string statusMessage, LoginDBContext context)
         {

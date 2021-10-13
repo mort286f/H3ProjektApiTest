@@ -20,12 +20,12 @@ namespace H3ProjektAPI.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        public readonly LoginDBContext data;
-        private DalManager manager = new DalManager();
+        private readonly LoginDBContext data;
+        private IDalManager manager = new DalManager();
 
-        public LoginController(LoginDBContext context)
+        public LoginController(ILoginDBContext data)
         {
-            data = context;
+            this.data = (LoginDBContext)data;
         }
 
         //HTTP post for user registration

@@ -55,6 +55,9 @@ namespace H3ProjektAPITest
                 };
             });
 
+            services.AddScoped<IDalManager, DalManager>();
+            services.AddScoped<ILoginDBContext, LoginDBContext>();
+
             services.AddCors(c =>
             {
                 c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
