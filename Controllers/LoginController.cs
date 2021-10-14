@@ -88,7 +88,7 @@ namespace H3ProjektAPI.Controllers
                 string dbHashedPass = manager.GetHashedPasswordFromDB(username, data);
                 //Checks if the hash value of the inputtet password by the user is equal
                 //to the password that is associated with the inputted username
-                if (manager.ValidatePassword(password, username, salt, dbHashedPass) == true)
+                if (manager.ValidatePassword(password, username, salt, dbHashedPass))
                 {
                     //If it is, then a new Json Web Token is created with a secret key, credentials and some token options.
                     var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SuperSecretKey@345"));
